@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<project name="lang" default="parser">
+
+	<!-- ANTLR version -->
+	<property name="antlr.version" value="4.5" />
+
+	<!-- ListLang parser -->
+	<target name="listlang-check-parser">
+		<condition property="listlang.parser.uptodate">
+			<and>
+				<uptodate srcfile="src/listlang/ListLang.g" targetfile="src/listlang/parser/ListLangParser.java" />
+				<uptodate srcfile="src/listlang/ListLang.g" targetfile="src/listlang/parser/ListLangLexer.java" />
+				<uptodate srcfile="src/listlang/ListLang.g" targetfile="src/listlang/parser/ListLangListener.java" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="listlang" depends="listlang-check-parser" unless="listlang.parser.uptodate">
+		<java jar="lib/antlr-${antlr.version}-complete.jar" dir="src/listlang/" fork="true" failonerror="true">
+			<arg value="-o" />
+			<arg value="parser/" />
+			<arg value="-no-listener" />
+			<arg value="-package" />
+			<arg value="listlang.parser; import static listlang.AST.*" />
+			<arg value="ListLang.g" />
+		</java>
+	</target>
+
+	<target name="parser" depends="listlang" >
+	</target>
+
+        <target name="compile" depends="parser">
+                <mkdir dir="build/classes"/>
+                <javac srcdir="src" destdir="build/classes">
+                        <classpath>
+                                <pathelement path="lib/antlr-4.5-complete.jar"/>
+                        </classpath>
+                </javac>
+        </target>
+
+        <target name="jar" depends="compile">
+                <mkdir dir="build/jar"/>
+                <jar destfile="build/jar/ListLang.jar" basedir="build/classes">
+                        <zipgroupfileset dir="lib" includes="antlr-4.5-complete.jar" />
+                        <manifest>
+                                <attribute name="Main-Class" value="listlang.Interpreter"/>
+                        </manifest>
+                </jar>
+        </target>
+
+        <target name="run" depends="jar">
+                <java jar="build/jar/ListLang.jar" fork="true"/>
+        </target>
+
+        <target name="clean">
+                <delete dir="build"/>
+        </target>
+
+
+</project>
