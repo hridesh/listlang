@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+// listlang is a stub left for a future edition: it currently contains only
+// AST.java, with no grammar or interpreter yet. This compiles what exists.
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+}
+
+sourceSets {
+    main { java { srcDirs = ['src'] } }
+}
